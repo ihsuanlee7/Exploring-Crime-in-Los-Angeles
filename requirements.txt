@@ -1,0 +1,6 @@
+duckdb
+pyspark
+pandas
+tableauhyperapi
+papermill
+requests

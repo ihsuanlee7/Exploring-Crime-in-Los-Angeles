@@ -1,6 +1,10 @@
+# Essentials
+pandas
+requests
 duckdb
 pyspark
-pandas
-tableauhyperapi
+
+# If needed
 papermill
-requests
+tableauhyperapi
+wheel  # Ensures correct package builds

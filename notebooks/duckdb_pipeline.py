@@ -1,21 +1,23 @@
 import duckdb
 import os
 
-# Define base directory relative to script location
-base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
-
-crime_input_path = os.path.join(base_dir, "Crime_Data_from_2020_to_Present_20250304.csv")
-inspection_input_path = os.path.join(base_dir, "Building_and_Safety_Inspections.csv")
-db_path = os.path.join(base_dir, "processed", "my_database.db")
-csv_output_path = os.path.join(base_dir, "processed", "crime_final.csv")
+# Define base directories
+DATA_DIR = "/home/ubuntu/data"
+PROCESSED_DIR = os.path.join(DATA_DIR, "processed")
 
 # Ensure processed directory exists
-os.makedirs(os.path.dirname(db_path), exist_ok=True)
+os.makedirs(PROCESSED_DIR, exist_ok=True)
 
-# Connect to DuckDB database
+# File paths
+crime_input_path = os.path.join(DATA_DIR, "Crime_Data_from_2020_to_Present_20250304.csv")
+inspection_input_path = os.path.join(DATA_DIR, "Building_and_Safety_Inspections.csv")
+db_path = os.path.join(PROCESSED_DIR, "my_database.db")
+csv_output_path = os.path.join(PROCESSED_DIR, "crime_final.csv")
+
+# Connect to DuckDB
 conn = duckdb.connect(db_path)
 
-# Create and load the inspection table
+# Step 1: Create `inspection` table FIRST
 conn.execute(f"""
     CREATE TABLE IF NOT EXISTS inspection AS 
     SELECT * 
@@ -26,7 +28,7 @@ conn.execute(f"""
     )
 """)
 
-# Create and load the crime table
+# Step 2: Create `crime` table
 conn.execute(f"""
     CREATE TABLE IF NOT EXISTS crime AS 
     SELECT * 
@@ -37,10 +39,10 @@ conn.execute(f"""
     )
 """)
 
-# Add downtown_distance column if it doesn't exist
+# Ensure `crime` table has `downtown_distance` column
 conn.execute("ALTER TABLE crime ADD COLUMN IF NOT EXISTS downtown_distance TEXT;")
 
-# Compute downtown distance categories using the correct logic
+# Compute downtown distance categories
 conn.execute("""
 UPDATE crime
 SET downtown_distance = 
@@ -57,30 +59,10 @@ SET downtown_distance =
     END;
 """)
 
-# Alternative distance query (for verification, but not needed to run separately)
-distance_query = """
-SELECT 
-    *,
-    CASE
-        WHEN distance_km <= 10 THEN '0-10km'
-        WHEN distance_km <= 20 THEN '10-20km'
-        ELSE '>20km'
-    END AS distance_group
-FROM (
-    SELECT
-        *,
-        SQRT(
-            POW((LAT - 34.0522) * 111, 2) + 
-            POW((LON - (-118.2437)) * 92, 2)
-        ) AS distance_km
-    FROM crime
-) sub
-"""
-
-# Add nearby_inspection_count column if it doesn't exist
+# Ensure `crime` table has `nearby_inspection_count` column
 conn.execute("ALTER TABLE crime ADD COLUMN IF NOT EXISTS nearby_inspection_count INTEGER DEFAULT 0;")
 
-# Update crime table with nearby inspection counts
+# Update `crime` with nearby inspection counts
 conn.execute("""
 UPDATE crime 
 SET nearby_inspection_count = (

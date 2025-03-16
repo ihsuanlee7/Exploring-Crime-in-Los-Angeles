@@ -4,14 +4,14 @@ set -e  # Exit immediately if any command fails
 
 echo "Starting full pipeline execution..."
 
-# Set the correct data directory
+# Set data directory paths
 DATA_DIR="/home/ubuntu/team14/data"
 PROCESSED_DIR="$DATA_DIR/processed"
 
-# Ensure the processed directory exists
+# Ensure processed directory exists
 mkdir -p "$PROCESSED_DIR"
 
-# Step 1: Verify that required data files exist
+# Step 1: Verify required data files exist
 if [[ ! -f "$DATA_DIR/Crime_Data_from_2020_to_Present_20250304.csv" || ! -f "$DATA_DIR/Building_and_Safety_Inspections.csv" ]]; then
     echo "ERROR: Missing required data files in $DATA_DIR"
     exit 1
@@ -19,12 +19,9 @@ fi
 echo "Data files found."
 
 # Step 2: Install dependencies
-echo "Installing necessary packages..."
+echo "Installing necessary Python packages..."
 pip install --upgrade pip
 pip install -r requirements.txt
-
-# Install GeoPandas separately (fixing Sedona import issue)
-pip install geopandas
 
 # Ensure Apache Sedona is properly installed
 echo "Reinstalling Apache Sedona..."
@@ -32,7 +29,7 @@ pip uninstall -y apache-sedona
 pip install apache-sedona
 
 # Step 3: Download SLF4J, Log4J, and Sedona dependencies
-echo "Downloading SLF4J, Log4J, and Sedona dependencies..."
+echo "Downloading necessary JAR dependencies..."
 mkdir -p jars
 
 # Download SLF4J No-Op Logger (Suppress warnings)
@@ -55,43 +52,37 @@ if [[ ! -f "jars/geotools-wrapper-1.5.0-29.2.jar" ]]; then
         https://repo1.maven.org/maven2/org/datasyslab/geotools-wrapper/1.5.0-29.2/geotools-wrapper-1.5.0-29.2.jar
 fi
 
-echo "All necessary JAR dependencies downloaded successfully."
+echo "JAR dependencies downloaded successfully."
 
 # Proceed to PySpark Processing
-echo "Running PySpark processing..."
-
-# Set classpath for Spark
-export SPARK_CLASSPATH=$PWD/jars/slf4j-nop.jar:$PWD/jars/log4j-core.jar:$PWD/jars/log4j-api.jar:$PWD/jars/sedona-python-adapter-3.0_2.12-1.7.1.jar:$PWD/jars/geotools-wrapper-1.5.0-29.2.jar
-
-# Step 4: Run PySpark processing first
 echo "Running PySpark processing..."
 if ! python3 notebooks/spark_pipeline.py; then
     echo "ERROR: Spark processing failed."
     exit 1
 fi
-
-# Step 5: Ensure Spark output files exist before running DuckDB
-if [[ ! -f "$PROCESSED_DIR/ins_processed.parquet" ]]; then
-    echo "ERROR: Spark processing failed. Expected files not found."
-    exit 1
-fi
 echo "PySpark processing completed."
 
-# Step 6: Now run DuckDB after Spark
+# Verify Spark output files before running DuckDB
+if [[ ! -f "$PROCESSED_DIR/ins_processed.parquet" ]]; then
+    echo "ERROR: Spark processing did not produce expected output."
+    exit 1
+fi
+
+# Step 4: Run DuckDB processing
 echo "Running DuckDB data processing..."
 if ! python3 notebooks/duckdb_pipeline.py; then
     echo "ERROR: DuckDB processing failed."
     exit 1
 fi
+echo "DuckDB processing completed."
 
-# Step 7: Verify DuckDB output files exist
+# Step 5: Verify DuckDB output files exist
 if [[ ! -f "$PROCESSED_DIR/crime_final.csv" || ! -f "$PROCESSED_DIR/ins.csv" ]]; then
     echo "ERROR: DuckDB processing failed. Output files not found."
     exit 1
 fi
-echo "DuckDB processing completed."
 
-# Step 8: Transfer files back to local machine (if necessary)
+# Step 6: Transfer files back to local machine
 echo "Transferring processed files to local machine..."
 scp -i MGMTMSA405.pem ubuntu@54.185.234.165:$PROCESSED_DIR/crime_final_spark.csv .
 scp -i MGMTMSA405.pem ubuntu@54.185.234.165:$PROCESSED_DIR/ins_final_spark.csv .

@@ -1,12 +1,19 @@
 #!/bin/bash
 
-set -e  # Exit script on error
+set -e  # Exit immediately if any command fails
 
 echo "Starting full pipeline execution..."
 
-# Step 1: Verify data files exist
-if [[ ! -f "/home/ubuntu/team14/data/Crime_Data_from_2020_to_Present_20250304.csv" || ! -f "/home/ubuntu/team14/data/Building_and_Safety_Inspections.csv" ]]; then
-    echo "ERROR: Missing required data files. Please check /home/ubuntu/team14/data/"
+# Set the correct data directory
+DATA_DIR="/home/ubuntu/data"
+PROCESSED_DIR="$DATA_DIR/processed"
+
+# Ensure the processed directory exists
+mkdir -p "$PROCESSED_DIR"
+
+# Step 1: Verify that required data files exist
+if [[ ! -f "$DATA_DIR/Crime_Data_from_2020_to_Present_20250304.csv" || ! -f "$DATA_DIR/Building_and_Safety_Inspections.csv" ]]; then
+    echo "ERROR: Missing required data files in $DATA_DIR"
     exit 1
 fi
 echo "Data files found."
@@ -15,32 +22,32 @@ echo "Data files found."
 echo "Installing necessary packages..."
 pip install -r requirements.txt
 
-# Step 3: Run DuckDB script
+# Step 3: Run DuckDB script to process data
 echo "Running DuckDB data processing..."
 python3 notebooks/duckdb_pipeline.py
 
-# Step 4: Check DuckDB output files
-if [[ ! -f "/home/ubuntu/team14/data/processed/crime_final.csv" || ! -f "/home/ubuntu/team14/data/processed/ins.csv" ]]; then
-    echo "ERROR: DuckDB output files not found."
+# Step 4: Verify DuckDB output files exist
+if [[ ! -f "$PROCESSED_DIR/crime_final.csv" || ! -f "$PROCESSED_DIR/ins.csv" ]]; then
+    echo "ERROR: DuckDB processing failed. Output files not found."
     exit 1
 fi
 echo "DuckDB processing completed."
 
 # Step 5: Run PySpark script
 echo "Running PySpark processing..."
-python3 spark_pipeline.py
+python3 notebooks/spark_pipeline.py
 
-# Step 6: Check PySpark output files
-if [[ ! -f "/home/ubuntu/team14/data/processed/crime_final_spark.csv" || ! -f "/home/ubuntu/team14/data/processed/ins_final_spark.csv" ]]; then
-    echo "ERROR: Spark output files not found."
+# Step 6: Verify PySpark output files exist
+if [[ ! -f "$PROCESSED_DIR/crime_final_spark.csv" || ! -f "$PROCESSED_DIR/ins_final_spark.csv" ]]; then
+    echo "ERROR: Spark processing failed. Output files not found."
     exit 1
 fi
 echo "PySpark processing completed."
 
-# Step 7: Transfer files back to local machine (optional)
-echo "Transferring files to local machine..."
-scp -i MGMTMSA405.pem ubuntu@54.185.234.165:/home/ubuntu/team14/data/processed/crime_final_spark.csv .
-scp -i MGMTMSA405.pem ubuntu@54.185.234.165:/home/ubuntu/team14/data/processed/ins_final_spark.csv .
+# Step 7: Transfer files back to local machine (if necessary)
+echo "Transferring processed files to local machine..."
+scp -i MGMTMSA405.pem ubuntu@54.185.234.165:$PROCESSED_DIR/crime_final_spark.csv .
+scp -i MGMTMSA405.pem ubuntu@54.185.234.165:$PROCESSED_DIR/ins_final_spark.csv .
 echo "Transfer complete. Check your local directory."
 
 echo "Pipeline execution completed successfully."

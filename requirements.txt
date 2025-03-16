@@ -7,3 +7,4 @@ requests
 pyarrow
 fastparquet
 apache-sedona
+commons-text>=1.10.0

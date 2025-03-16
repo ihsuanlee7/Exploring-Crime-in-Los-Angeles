@@ -12,8 +12,8 @@ import pandas as pd
 os.makedirs("/home/ubuntu/data/processed", exist_ok=True)
 
 # Define file paths
-crime_input_path = "/home/ubuntu/data/raw/Crime_Data_from_2020_to_Present_20250304.csv"
-ins_input_path = "/home/ubuntu/data/raw/Building_and_Safety_Inspections.csv"
+crime_input_path = "/home/ubuntu/data/Crime_Data_from_2020_to_Present_20250304.csv"
+ins_input_path = "/home/ubuntu/data/Building_and_Safety_Inspections.csv"
 crime_output_path = "/home/ubuntu/data/processed/crime_final.csv"
 ins_output_path = "/home/ubuntu/data/processed/ins.csv"
 

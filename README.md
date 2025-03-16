@@ -14,7 +14,7 @@ The pipeline automates downloading the two large dataset and running the PySpark
 
 ## Pipeline automation
 1. Connect to your EC2 instance.
-2. Clone this repository: `git clone https://github.com/Prof-Rosario-UCLA/team14.git`
+2. Clone this repository (only if you have not already): `git clone https://github.com/Prof-Rosario-UCLA/team14.git`
 3. Enter the team directory: `cd team14`
 4. Activate the virtual environment: `source venv/bin/activate`
 5. Run the pipeline: `bash bash/pipeline.sh`

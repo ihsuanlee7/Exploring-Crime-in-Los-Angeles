@@ -18,4 +18,4 @@ After importing the files, the pipeline runs the PySpark script and the DuckDB s
    `cd ~/team14`<br>
    `source venv/bin/activate`
 4. Clone this repository: `git clone https://github.com/Prof-Rosario-UCLA/team14.git`
-5. Run pipeline: bash bash/pipeline.sh
+5. Run pipeline: `bash bash/pipeline.sh`

@@ -6,3 +6,4 @@ papermill
 requests
 pyarrow
 fastparquet
+apache-sedona

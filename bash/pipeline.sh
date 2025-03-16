@@ -31,7 +31,7 @@ echo "Reinstalling Apache Sedona..."
 pip uninstall -y apache-sedona
 pip install apache-sedona
 
-# Step 3: Download SLF4J, Log4J, and Sedona JAR dependencies
+# Step 3: Download SLF4J, Log4J, and Sedona dependencies
 echo "Downloading SLF4J, Log4J, and Sedona dependencies..."
 mkdir -p jars
 
@@ -55,7 +55,10 @@ if [[ ! -f "jars/geotools-wrapper-1.5.0-29.2.jar" ]]; then
         https://repo1.maven.org/maven2/org/datasyslab/geotools-wrapper/1.5.0-29.2/geotools-wrapper-1.5.0-29.2.jar
 fi
 
-echo "All necessary JAR dependencies downloaded."
+echo "All necessary JAR dependencies downloaded successfully."
+
+# Proceed to PySpark Processing
+echo "Running PySpark processing..."
 
 # Set classpath for Spark
 export SPARK_CLASSPATH=$PWD/jars/slf4j-nop.jar:$PWD/jars/log4j-core.jar:$PWD/jars/log4j-api.jar:$PWD/jars/sedona-python-adapter-3.0_2.12-1.7.1.jar:$PWD/jars/geotools-wrapper-1.5.0-29.2.jar

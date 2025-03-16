@@ -15,17 +15,23 @@ os.environ["SPARK_CLASSPATH"] = "/home/ubuntu/team14/venv/lib/python3.12/site-pa
 from pyspark.sql import SparkSession
 from sedona.spark import SedonaContext
 
-# Define JAR paths
-JAR_PATHS = "/home/ubuntu/team14/jars/sedona-python-adapter-3.0_2.12-1.7.1.jar,/home/ubuntu/team14/jars/geotools-wrapper-1.5.0-29.2.jar"
+# Define the necessary Sedona JAR paths
+sedona_jars = [
+    "/home/ubuntu/team14/jars/sedona-python-adapter-3.0_2.12-1.7.1.jar",
+    "/home/ubuntu/team14/jars/geotools-wrapper-1.5.0-29.2.jar"
+]
 
+# Create Spark Session with Sedona JARs
 spark = SparkSession.builder \
     .appName("YourAppName") \
-    .config("spark.jars", JAR_PATHS) \
-    .config("spark.sql.extensions", "org.apache.sedona.sql.SedonaSqlExtensions") \
+    .config("spark.driver.extraClassPath", ":".join(sedona_jars)) \
+    .config("spark.executor.extraClassPath", ":".join(sedona_jars)) \
     .getOrCreate()
 
-# Initialize SedonaContext
+# Initialize Sedona Context
 sedona = SedonaContext.create(spark)
+
+print("Sedona initialized successfully.")
 
 # Define file paths
 crime_input_path = "data/processed/crime_final.csv"

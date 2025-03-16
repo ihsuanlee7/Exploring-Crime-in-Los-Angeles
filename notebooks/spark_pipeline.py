@@ -13,7 +13,7 @@ os.environ["PYSPARK_SUBMIT_ARGS"] = "--conf spark.driver.extraJavaOptions=-Dlog4
 os.environ["SPARK_CLASSPATH"] = "/home/ubuntu/team14/venv/lib/python3.12/site-packages/pyspark/jars/slf4j-log4j12-1.7.36.jar"
 
 from pyspark.sql import SparkSession
-from sedona.sql import SedonaContext
+from sedona.spark import SedonaContext
 
 spark = SparkSession.builder \
     .appName("YourAppName") \

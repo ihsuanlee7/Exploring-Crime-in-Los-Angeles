@@ -5,7 +5,7 @@ set -e  # Exit immediately if any command fails
 echo "Starting full pipeline execution..."
 
 # Set the correct data directory
-DATA_DIR="/home/ubuntu/data"
+DATA_DIR="/home/ubuntu/team14/data"
 PROCESSED_DIR="$DATA_DIR/processed"
 
 # Ensure the processed directory exists

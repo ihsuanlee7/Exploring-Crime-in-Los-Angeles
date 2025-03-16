@@ -55,6 +55,8 @@ fi
 echo "JAR dependencies downloaded successfully."
 
 # Proceed to PySpark Processing
+export SPARK_CLASSPATH="/home/ubuntu/team14/jars/sedona-python-adapter-3.0_2.12-1.7.1.jar:/home/ubuntu/team14/jars/geotools-wrapper-1.5.0-29.2.jar"
+
 echo "Running PySpark processing..."
 if ! python3 notebooks/spark_pipeline.py; then
     echo "ERROR: Spark processing failed."

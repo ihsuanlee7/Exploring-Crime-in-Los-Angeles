@@ -13,9 +13,8 @@ A dataset containing records of reported crimes in Los Angeles, including date, 
 After importing the files, the pipeline runs the PySpark script and the DuckDB script. This outputs csv files that are used to populate the Tableau dashboard.
 
 ## Pipeline automation
-1. Enter an EC2 instance.
-2. Enter a virtual machine:<br>
-   `cd ~/team14`<br>
-   `source venv/bin/activate`
-4. Clone this repository: `git clone https://github.com/Prof-Rosario-UCLA/team14.git`
-5. Run pipeline: `bash bash/pipeline.sh`
+1. Connect to your EC2 instance.
+2. Clone this repository: `git clone https://github.com/Prof-Rosario-UCLA/team14.git`
+3. Enter the team directory: `cd team14`
+4. Activate the virtual environment: `source venv/bin/activate`
+5. Run the pipeline: `bash bash/pipeline.sh`

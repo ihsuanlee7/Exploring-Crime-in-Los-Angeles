@@ -13,7 +13,7 @@ After importing the files, the pipeline first runs the Spark script and then run
 
 ## Pipeline automation
 1. Enter an EC2 instance.
-2. Enter a virtual machine:
-   `cd ~/team14
-   source venv/bin/activate`
+2. Enter a virtual machine:<br>
+   `cd ~/team14`<br>
+   `source venv/bin/activate`
 4. nd clone this repository. We can then do `bash bash\pipeline.sh`.

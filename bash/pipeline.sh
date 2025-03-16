@@ -22,27 +22,27 @@ echo "Data files found."
 echo "Installing necessary packages..."
 pip install -r requirements.txt
 
-# Step 3: Run DuckDB script to process data
+# Step 3: Run PySpark processing first
+echo "Running PySpark processing..."
+python3 notebooks/spark_pipeline.py
+
+# Step 4: Ensure Spark output files exist before running DuckDB
+if [[ ! -f "$PROCESSED_DIR/ins_processed.parquet" ]]; then
+    echo "ERROR: Spark processing failed. Expected files not found."
+    exit 1
+fi
+echo "PySpark processing completed."
+
+# Step 5: Now run DuckDB after Spark
 echo "Running DuckDB data processing..."
 python3 notebooks/duckdb_pipeline.py
 
-# Step 4: Verify DuckDB output files exist
+# Step 6: Verify DuckDB output files exist
 if [[ ! -f "$PROCESSED_DIR/crime_final.csv" || ! -f "$PROCESSED_DIR/ins.csv" ]]; then
     echo "ERROR: DuckDB processing failed. Output files not found."
     exit 1
 fi
 echo "DuckDB processing completed."
-
-# Step 5: Run PySpark script
-echo "Running PySpark processing..."
-python3 notebooks/spark_pipeline.py
-
-# Step 6: Verify PySpark output files exist
-if [[ ! -f "$PROCESSED_DIR/crime_final_spark.csv" || ! -f "$PROCESSED_DIR/ins_final_spark.csv" ]]; then
-    echo "ERROR: Spark processing failed. Output files not found."
-    exit 1
-fi
-echo "PySpark processing completed."
 
 # Step 7: Transfer files back to local machine (if necessary)
 echo "Transferring processed files to local machine..."

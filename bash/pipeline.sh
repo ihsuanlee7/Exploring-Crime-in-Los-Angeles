@@ -26,7 +26,7 @@ pip install -r requirements.txt
 # Ensure Apache Sedona is properly installed
 echo "Reinstalling Apache Sedona..."
 pip uninstall -y apache-sedona
-pip install apache-sedona==1.6.1
+pip install apache-sedona
 
 # Step 3: Download SLF4J, Log4J, and Sedona dependencies
 echo "Downloading necessary JAR dependencies..."

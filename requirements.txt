@@ -1,10 +1,8 @@
-# Essentials
-pandas
-requests
 duckdb
 pyspark
-
-# If needed
-papermill
+pandas
 tableauhyperapi
-wheel  # Ensures correct package builds
+papermill
+requests
+pyarrow
+fastparquet

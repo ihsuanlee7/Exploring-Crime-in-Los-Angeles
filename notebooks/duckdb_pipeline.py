@@ -2,7 +2,7 @@ import duckdb
 import os
 
 # Define base directories
-DATA_DIR = "/home/ubuntu/data"
+DATA_DIR = "/home/ubuntu/team14/data"
 PROCESSED_DIR = os.path.join(DATA_DIR, "processed")
 
 # Ensure processed directory exists

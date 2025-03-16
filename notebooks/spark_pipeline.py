@@ -12,7 +12,8 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 # Register Sedona for spatial operations
-SedonaRegistrator.registerAll(spark)
+from sedona.sql import SedonaContext
+SedonaContext.create(spark)
 
 # Define file paths
 crime_input_path = "data/processed/crime_final.csv"

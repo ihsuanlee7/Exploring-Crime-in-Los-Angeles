@@ -23,6 +23,10 @@ echo "Installing necessary packages..."
 pip install --upgrade pip
 pip install -r requirements.txt
 
+# Ensure Apache Sedona is properly installed
+pip uninstall -y apache-sedona
+pip install apache-sedona
+
 # Step 3: Run PySpark processing first
 echo "Running PySpark processing..."
 python3 notebooks/spark_pipeline.py

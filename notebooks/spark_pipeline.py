@@ -6,12 +6,18 @@ from sedona.register import SedonaRegistrator
 import json
 
 import os
+# Ensure Spark finds the correct logging libraries
 os.environ["PYSPARK_SUBMIT_ARGS"] = "--conf spark.driver.extraJavaOptions=-Dlog4j2.formatMsgNoLookups=true pyspark-shell"
 
-# Initialize Spark session
+# Optionally specify an SLF4J implementation (logback)
+os.environ["SPARK_CLASSPATH"] = "/home/ubuntu/team14/venv/lib/python3.12/site-packages/pyspark/jars/slf4j-log4j12-1.7.36.jar"
+
+from pyspark.sql import SparkSession
+from sedona.sql import SedonaContext
+
 spark = SparkSession.builder \
-    .appName("Crime and Inspection Data Processing") \
-    .config("spark.driver.memory", "2g") \
+    .appName("YourAppName") \
+    .config("spark.driver.extraClassPath", "/home/ubuntu/team14/venv/lib/python3.12/site-packages/pyspark/jars/slf4j-log4j12-1.7.36.jar") \
     .getOrCreate()
 
 # Register Sedona for spatial operations

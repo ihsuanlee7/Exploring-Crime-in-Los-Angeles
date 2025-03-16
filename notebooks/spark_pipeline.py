@@ -21,7 +21,6 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 # Register Sedona for spatial operations
-from sedona.sql import SedonaContext
 sedona = SedonaContext.create(spark)
 
 # Define file paths

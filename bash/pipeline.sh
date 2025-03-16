@@ -1,35 +1,46 @@
 #!/bin/bash
 
-echo "Starting the ETL pipeline..."
+set -e  # Exit script on error
 
-# Step 1: Ensure large dataset files exist
-if [ ! -f "data/raw/Crime_Data_from_2020_to_2024.csv" ] || [ ! -f "data/raw/Building_and_Safety_Inspections.csv" ]; then
-    echo "Error: Required datasets are missing in data/raw/. Please upload them to EC2 before running."
+echo "Starting full pipeline execution..."
+
+# Step 1: Verify data files exist
+if [[ ! -f "/home/ubuntu/data/Crime_Data_from_2020_to_Present_20250304.csv" || ! -f "/home/ubuntu/data/Building_and_Safety_Inspections.csv" ]]; then
+    echo "ERROR: Missing required data files. Please check /home/ubuntu/data/"
     exit 1
 fi
+echo "Data files found."
 
-# Step 2: Run DuckDB pipeline
-echo "Running DuckDB pipeline..."
-papermill notebooks/duckdb_pipeline.ipynb notebooks/output_duck.ipynb
-if [ $? -ne 0 ]; then
-    echo "DuckDB pipeline failed. Exiting."
+# Step 2: Install dependencies
+echo "Installing necessary packages..."
+pip install -r requirements.txt
+
+# Step 3: Run DuckDB script
+echo "Running DuckDB data processing..."
+python3 duckdb_pipeline.py
+
+# Step 4: Check DuckDB output files
+if [[ ! -f "/home/ubuntu/data/processed/crime_final.csv" || ! -f "/home/ubuntu/data/processed/ins.csv" ]]; then
+    echo "ERROR: DuckDB output files not found."
     exit 1
 fi
+echo "DuckDB processing completed."
 
-# Step 3: Run Spark pipeline
-echo "Running Spark pipeline..."
-papermill notebooks/spark_pipeline.ipynb notebooks/output_spark.ipynb
-if [ $? -ne 0 ]; then
-    echo "Spark pipeline failed. Exiting."
+# Step 5: Run PySpark script
+echo "Running PySpark processing..."
+python3 spark_pipeline.py
+
+# Step 6: Check PySpark output files
+if [[ ! -f "/home/ubuntu/data/processed/crime_final_spark.csv" || ! -f "/home/ubuntu/data/processed/ins_final_spark.csv" ]]; then
+    echo "ERROR: Spark output files not found."
     exit 1
 fi
+echo "PySpark processing completed."
 
-# Step 4: Confirm processed files exist
-if [ -f "data/processed/crime_final_spark.csv" ] && [ -f "data/processed/ins_final_spark.csv" ]; then
-    echo "Processed data saved successfully in data/processed/. Ready for Tableau."
-else
-    echo "Error: Output files not found. Something went wrong."
-    exit 1
-fi
+# Step 7: Transfer files back to local machine (optional)
+echo "Transferring files to local machine..."
+scp -i MGMTMSA405.pem ubuntu@54.185.234.165:/home/ubuntu/data/processed/crime_final_spark.csv .
+scp -i MGMTMSA405.pem ubuntu@54.185.234.165:/home/ubuntu/data/processed/ins_final_spark.csv .
+echo "Transfer complete. Check your local directory."
 
-exit 0
+echo "Pipeline execution completed successfully."

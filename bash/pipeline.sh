@@ -17,7 +17,7 @@ pip install -r requirements.txt
 
 # Step 3: Run DuckDB script
 echo "Running DuckDB data processing..."
-python3 duckdb_pipeline.py
+python3 notebooks/duckdb_pipeline.py
 
 # Step 4: Check DuckDB output files
 if [[ ! -f "/home/ubuntu/data/processed/crime_final.csv" || ! -f "/home/ubuntu/data/processed/ins.csv" ]]; then

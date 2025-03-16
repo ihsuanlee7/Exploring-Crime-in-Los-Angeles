@@ -23,6 +23,9 @@ echo "Installing necessary packages..."
 pip install --upgrade pip
 pip install -r requirements.txt
 
+# Install GeoPandas separately (fixing Sedona import issue)
+pip install geopandas
+
 # Ensure Apache Sedona is properly installed
 echo "Reinstalling Apache Sedona..."
 pip uninstall -y apache-sedona
@@ -46,7 +49,10 @@ export SPARK_CLASSPATH=$PWD/jars/slf4j-nop.jar:$PWD/jars/log4j-core.jar:$PWD/jar
 
 # Step 4: Run PySpark processing first
 echo "Running PySpark processing..."
-python3 notebooks/spark_pipeline.py
+if ! python3 notebooks/spark_pipeline.py; then
+    echo "ERROR: Spark processing failed."
+    exit 1
+fi
 
 # Step 5: Ensure Spark output files exist before running DuckDB
 if [[ ! -f "$PROCESSED_DIR/ins_processed.parquet" ]]; then
@@ -57,7 +63,10 @@ echo "PySpark processing completed."
 
 # Step 6: Now run DuckDB after Spark
 echo "Running DuckDB data processing..."
-python3 notebooks/duckdb_pipeline.py
+if ! python3 notebooks/duckdb_pipeline.py; then
+    echo "ERROR: DuckDB processing failed."
+    exit 1
+fi
 
 # Step 7: Verify DuckDB output files exist
 if [[ ! -f "$PROCESSED_DIR/crime_final.csv" || ! -f "$PROCESSED_DIR/ins.csv" ]]; then

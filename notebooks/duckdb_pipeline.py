@@ -1,64 +1,100 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import duckdb
 import os
-import pandas as pd
 
-# Ensure necessary directories exist
-os.makedirs("/home/ubuntu/data/processed", exist_ok=True)
+# Define base directory relative to script location
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
+crime_input_path = os.path.join(base_dir, "Crime_Data_from_2020_to_Present.csv")
+inspection_input_path = os.path.join(base_dir, "Inspection_Data.csv")  # Assuming correct filename
+db_path = os.path.join(base_dir, "processed", "my_database.db")
+csv_output_path = os.path.join(base_dir, "processed", "crime_final.csv")
 
-# Define file paths
-crime_input_path = "/home/ubuntu/data/Crime_Data_from_2020_to_Present_20250304.csv"
-ins_input_path = "/home/ubuntu/data/Building_and_Safety_Inspections.csv"
-crime_output_path = "/home/ubuntu/data/processed/crime_final.csv"
-ins_output_path = "/home/ubuntu/data/processed/ins.csv"
+# Ensure processed directory exists
+os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
-# Connect to DuckDB in-memory database
-con = duckdb.connect(database=":memory:")
+# Connect to DuckDB database
+conn = duckdb.connect(db_path)
 
-# Load raw crime data
-crime_df = pd.read_csv(crime_input_path)
-con.register("crime_raw", crime_df)
+# Create and load the inspection table
+conn.execute(f"""
+    CREATE TABLE IF NOT EXISTS inspection AS 
+    SELECT * 
+    FROM read_csv_auto(
+        '{inspection_input_path}', 
+        HEADER=TRUE, 
+        DELIM=','
+    )
+""")
 
-# Select relevant columns & transform
-crime_final = con.execute("""
-    SELECT 
-        "DATE OCC",
-        "AREA NAME",
-        "Crm Cd Desc",
-        "Vict Age",
-        "Vict Sex",
-        "Vict Descent"
-    FROM crime_raw
-""").df()
+# Create and load the crime table
+conn.execute(f"""
+    CREATE TABLE IF NOT EXISTS crime AS 
+    SELECT * 
+    FROM read_csv_auto(
+        '{crime_input_path}', 
+        HEADER=TRUE, 
+        DELIM=','
+    )
+""")
 
-# Save processed crime data
-crime_final.to_csv(crime_output_path, index=False)
+# Add downtown_distance column if it doesn't exist
+conn.execute("ALTER TABLE crime ADD COLUMN IF NOT EXISTS downtown_distance TEXT;")
 
-# Load raw inspection data
-ins_df = pd.read_csv(ins_input_path)
-con.register("ins_raw", ins_df)
+# Compute downtown distance categories using the correct logic
+conn.execute("""
+UPDATE crime
+SET downtown_distance = 
+    CASE
+        WHEN SQRT(
+                POW((LAT - 34.0522) * 111, 2) + 
+                POW((LON - (-118.2437)) * 92, 2)
+            ) <= 10 THEN '0-10km'
+        WHEN SQRT(
+                POW((LAT - 34.0522) * 111, 2) + 
+                POW((LON - (-118.2437)) * 92, 2)
+            ) <= 20 THEN '10-20km'
+        ELSE '>20km'
+    END;
+""")
 
-# Select relevant columns & transform
-ins_final = con.execute("""
-    SELECT 
-        "Inspection Date",
-        "Latitude/Longitude",
-        "Action Taken",
-        "Result",
-        "Inspection Type"
-    FROM ins_raw
-""").df()
+# Alternative distance query (for verification, but not needed to run separately)
+distance_query = """
+SELECT 
+    *,
+    CASE
+        WHEN distance_km <= 10 THEN '0-10km'
+        WHEN distance_km <= 20 THEN '10-20km'
+        ELSE '>20km'
+    END AS distance_group
+FROM (
+    SELECT
+        *,
+        SQRT(
+            POW((LAT - 34.0522) * 111, 2) + 
+            POW((LON - (-118.2437)) * 92, 2)
+        ) AS distance_km
+    FROM crime
+) sub
+"""
 
-# Save processed inspection data
-ins_final.to_csv(ins_output_path, index=False)
+# Add nearby_inspection_count column if it doesn't exist
+conn.execute("ALTER TABLE crime ADD COLUMN IF NOT EXISTS nearby_inspection_count INTEGER DEFAULT 0;")
 
-print("DuckDB processing completed. Processed data saved.")
+# Update crime table with nearby inspection counts
+conn.execute("""
+UPDATE crime 
+SET nearby_inspection_count = (
+    SELECT COUNT(*)
+    FROM inspection
+    WHERE 
+        inspection.latitude BETWEEN crime.LAT - 0.005 AND crime.LAT + 0.005
+        AND inspection.longitude BETWEEN crime.LON - 0.005 AND crime.LON + 0.005
+        AND (POW((inspection.latitude - crime.LAT) * 111000, 2) + 
+             POW((inspection.longitude - crime.LON) * 92000, 2)) < 250000  
+);
+""")
+
+# Export the processed crime data to CSV
+conn.execute(f"COPY crime TO '{csv_output_path}' (FORMAT CSV, HEADER TRUE);")
 
 # Close connection
-con.close()
-
+conn.close()

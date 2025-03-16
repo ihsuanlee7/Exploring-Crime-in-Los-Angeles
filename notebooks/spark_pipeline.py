@@ -17,10 +17,11 @@ from sedona.spark import SedonaContext
 
 spark = SparkSession.builder \
     .appName("YourAppName") \
-    .config("spark.driver.extraClassPath", "/home/ubuntu/team14/venv/lib/python3.12/site-packages/pyspark/jars/slf4j-log4j12-1.7.36.jar") \
+    .config("spark.jars.packages", "org.apache.sedona:sedona-python-adapter-3.0_2.12:1.7.1,org.datasyslab:geotools-wrapper:1.5.0-29.2") \
+    .config("spark.sql.extensions", "org.apache.sedona.sql.SedonaSqlExtensions") \
     .getOrCreate()
 
-# Register Sedona for spatial operations
+# Try to initialize Sedona again
 sedona = SedonaContext.create(spark)
 
 # Define file paths

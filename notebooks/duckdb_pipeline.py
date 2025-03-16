@@ -3,8 +3,8 @@ import os
 
 # Define base directory relative to script location
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
-crime_input_path = os.path.join(base_dir, "Crime_Data_from_2020_to_Present.csv")
-inspection_input_path = os.path.join(base_dir, "Inspection_Data.csv")  # Assuming correct filename
+crime_input_path = os.path.join(base_dir, "Crime_Data_from_2020_to_Present_20250304.csv")
+inspection_input_path = os.path.join(base_dir, "Building_and_Safety_Inspections.csv")
 db_path = os.path.join(base_dir, "processed", "my_database.db")
 csv_output_path = os.path.join(base_dir, "processed", "crime_final.csv")
 

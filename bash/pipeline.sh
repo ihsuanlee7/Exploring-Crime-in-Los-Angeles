@@ -20,6 +20,7 @@ echo "Data files found."
 
 # Step 2: Install dependencies
 echo "Installing necessary packages..."
+pip install --upgrade pip
 pip install -r requirements.txt
 
 # Step 3: Run PySpark processing first

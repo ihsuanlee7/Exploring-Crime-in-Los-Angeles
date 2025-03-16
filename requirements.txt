@@ -8,4 +8,4 @@ pyarrow
 fastparquet
 apache-sedona
 shapely
-commons-text==1.9
+apache-commons-text==1.9

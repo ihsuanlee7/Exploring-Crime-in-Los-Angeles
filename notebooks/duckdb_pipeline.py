@@ -47,7 +47,7 @@ con.register("ins_raw", ins_df)
 ins_final = con.execute("""
     SELECT 
         "Inspection Date",
-        "Location",
+        "Latitude/Longitude",
         "Action Taken",
         "Result",
         "Inspection Type"

@@ -5,6 +5,9 @@ from math import radians, cos, sin, asin, sqrt
 from sedona.register import SedonaRegistrator
 import json
 
+import os
+os.environ["PYSPARK_SUBMIT_ARGS"] = "--conf spark.driver.extraJavaOptions=-Dlog4j2.formatMsgNoLookups=true pyspark-shell"
+
 # Initialize Spark session
 spark = SparkSession.builder \
     .appName("Crime and Inspection Data Processing") \

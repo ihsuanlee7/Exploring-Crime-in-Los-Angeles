@@ -19,3 +19,6 @@ The pipeline automates downloading the two large dataset and running the PySpark
 4. Pull the latest changes (if needed): `git pull origin main`
 5. Activate the virtual environment: `source venv/bin/activate`
 6. Run the pipeline: `bash bash/pipeline.sh`
+
+## Data Visualization
+[Link](https://public.tableau.com/app/profile/i.hsuan.lee6901/viz/405book/Dashboard1?publish=yes)

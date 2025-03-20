@@ -12,6 +12,17 @@ A dataset containing records of reported crimes in Los Angeles, including date, 
 ## Pipeline logic
 The pipeline automates downloading the two large dataset and running the PySpark and DuckDB scripts. This process outputs `.csv` files that are used to populate the Tableau dashboard.
 
+## Pipleline automation(running your ETL pipeline locally):
+1. Clone this repository (only if you have not already): `git clone https://github.com/Prof-Rosario-UCLA/team14.git`, but you really only need the content in final_405 directory
+2. Enter the team directory: `cd cd team14/final_405`
+3. Download the data from datasets section, you can find the data we use in the folder: [link](https://drive.google.com/drive/folders/1I45w8szj2sQVF1WZzX8srBmxEEFmLCBz?usp=sharing)
+4. Modify etl.py's TODO section to your working directory
+5. Pull the latest changes (if needed): `git pull origin main`
+6. download required packages with the following command in terminal: pip install -r requirements.txt
+7. Install Java and Set Java Environment Variable with the command: export JAVA_HOME=/path/to/your/java
+8. Run the script with: python your_script.py
+
+   
 ## Pipeline automation
 1. Connect to your EC2 instance.
 2. Clone this repository (only if you have not already): `git clone https://github.com/Prof-Rosario-UCLA/team14.git`

@@ -9,6 +9,8 @@ A dataset containing businesses located in Los Angeles, including business name,
 Crime Data from 2020 to Present (248MB): [link](https://data.lacity.org/Public-Safety/Crime-Data-from-2020-to-Present/2nrs-mtv8/about_data)<br>
 A dataset containing records of reported crimes in Los Angeles, including date, location(Latitude and Longitude), crime type, crime detail, etc. (Updated Feb 2025)
 
+## EDA
+
 ## Pipeline logic
 The pipeline automates downloading the two large dataset and running the PySpark and DuckDB scripts. This process outputs `.csv` files that are used to populate the Tableau dashboard.
 
@@ -21,7 +23,6 @@ The pipeline automates downloading the two large dataset and running the PySpark
 6. download required packages with the following command in terminal: pip install -r requirements.txt
 7. Install Java and Set Java Environment Variable with the command: export JAVA_HOME=/path/to/your/java
 8. Run the script with: python your_script.py
-
    
 ## Pipeline automation
 1. Connect to your EC2 instance.

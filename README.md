@@ -34,3 +34,5 @@ The pipeline automates downloading the two large dataset and running the PySpark
 
 ## Data Visualization
 Please view our Tableau dashboard through this [Link](https://public.tableau.com/app/profile/i.hsuan.lee6901/viz/405book/Dashboard1?publish=yes)
+
+We made these modifications in Tableau dashboard after presentation: We made the dashboard more interactive by apply the crime type filter to Monthly Crime and Percentage of Victim Descent graphs as well. Also, by clicking on the Victim Descent chart, these two graphs can also change accordingly to reflect the distribution and trend for specific ethnic group. Altogether, you can filter crime type and victim descent together to see the crime counts over time. 
